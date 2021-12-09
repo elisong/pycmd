@@ -72,7 +72,7 @@ def get_links():
     return links
 
 
-if __name__ == "__main__":
+def main():
     command = ' '.join(sys.argv)
     print("> 开始执行`%s`" % command)
     file_name = args.output_file or args.query
@@ -84,3 +84,6 @@ if __name__ == "__main__":
     mdFile.new_list(items=links)
     mdFile.create_md_file()
     print("> 🤠OK")
+
+if __name__ == "__main__":
+    main()
