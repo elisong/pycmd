@@ -7,6 +7,7 @@
 - **venv**: create Python vitual environment according version selected
 - **license**: get LICENSE template, "[year][name]" replace by current year and git user.name
 - **ignore**: get .gitignore template for specified language
+- **password**: generate random password
 
 ## Install
 
