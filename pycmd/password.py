@@ -34,7 +34,7 @@ def main():
         if all([cond_digit, cond_lower, cond_upper, cond_spec]):
             break
     pyperclip.copy(text)
-    print(f"{text}\n\n☕️ Alreay copied, just paste it")
+    print(f"{text}\n\n☕️ Alreay copied, just paste it.")
 
 
 if __name__ == "__main__":
