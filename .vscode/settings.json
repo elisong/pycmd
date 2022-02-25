@@ -1,7 +1,0 @@
-{
-  "python.pythonPath": ".venv/bin/python",
-  "python.linting.flake8Enabled": true,
-  "python.linting.flake8Args": ["--config=setup.cfg"],
-  "python.formatting.provider": "black",
-  "python.formatting.blackArgs": ["--config=pyproject.toml"]
-}
