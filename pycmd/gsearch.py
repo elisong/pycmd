@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-# usage: gsearch [-h] [--site SITE] [--filetype FILETYPE] [--intitle INTITLE]
+# Description: Search from google
+# Usage: gsearch [-h] [--site SITE] [--filetype FILETYPE] [--intitle INTITLE]
 #               [--inurl INURL] [--link LINK] [--proxy-host PROXY_HOST]
 #               [--proxy-port PROXY_PORT] [-n NUM] [-o OUTPUT_FILE]
 #               [-t OUTPUT_TITLE]
@@ -8,37 +9,25 @@ import sys
 import argparse
 import subprocess
 
-parser = argparse.ArgumentParser(
-    prog='gsearch', description='Google Search Command')
-parser.add_argument('query', type=str, help='Query')
-parser.add_argument('--site', type=str,
-                    help='Restricted to specified site')
-parser.add_argument('--filetype', type=str,
-                    help='Restricted to specified type documents')
-parser.add_argument('--intitle', type=str,
-                    help='Restricted to pages with specified title')
-parser.add_argument('--inurl', type=str,
-                    help='Restricted to pages with specified word in url')
-parser.add_argument('--link', type=str,
-                    help='Restricted to pages that links to specified web')
-parser.add_argument('--proxy-host', type=str,
-                    help='Socks5 proxy host')
-parser.add_argument('--proxy-port', type=int,
-                    help='Socks5 proxy port')
-parser.add_argument('-n', '--num', type=int, default=10,
-                    help='max number of pages return')
-parser.add_argument('-o', '--output-file', type=str,
-                    help='output markdown file name')
-parser.add_argument('-t', '--output-title', type=str,
-                    help="output content title")
+parser = argparse.ArgumentParser(prog="gsearch", description="Google Search Command")
+parser.add_argument("query", type=str, help="Query")
+parser.add_argument("--site", type=str, help="Restricted to specified site")
+parser.add_argument("--filetype", type=str, help="Restricted to specified type documents")
+parser.add_argument("--intitle", type=str, help="Restricted to pages with specified title")
+parser.add_argument("--inurl", type=str, help="Restricted to pages with specified word in url")
+parser.add_argument("--link", type=str, help="Restricted to pages that links to specified web")
+parser.add_argument("--proxy-host", type=str, help="Socks5 proxy host")
+parser.add_argument("--proxy-port", type=int, help="Socks5 proxy port")
+parser.add_argument("-n", "--num", type=int, default=10, help="max number of pages return")
+parser.add_argument("-o", "--output-file", type=str, help="output markdown file name")
+parser.add_argument("-t", "--output-title", type=str, help="output content title")
 args = parser.parse_args()
 
 
 def check_deps():
     if args.proxy_host and args.proxy_port:
         python = sys.executable
-        subprocess.check_call([python, '-m', 'pip', 'install', 'pysocks'],
-                              stdout=subprocess.DEVNULL)
+        subprocess.check_call([python, "-m", "pip", "install", "pysocks"], stdout=subprocess.DEVNULL)
 
 
 check_deps()
@@ -46,6 +35,7 @@ check_deps()
 if args.proxy_host and args.proxy_port:
     import socket
     import socks
+
     socks.set_default_proxy(socks.SOCKS5, args.proxy_host, args.proxy_port)
     socket.socket = socks.socksocket
 from bs4 import BeautifulSoup
@@ -67,13 +57,13 @@ def get_links():
             link = "[" + soup.title.string + "](" + url + ")"
             print("> - " + link)
             links.append(link)
-        except:
+        except Exception:
             pass
     return links
 
 
 def main():
-    command = ' '.join(sys.argv)
+    command = " ".join(sys.argv)
     print("> 开始执行`%s`" % command)
     file_name = args.output_file or args.query
     title = args.output_title or args.query
@@ -84,6 +74,7 @@ def main():
     mdFile.new_list(items=links)
     mdFile.create_md_file()
     print("> 🤠OK")
+
 
 if __name__ == "__main__":
     main()

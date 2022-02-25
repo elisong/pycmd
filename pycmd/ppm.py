@@ -37,11 +37,9 @@ cmd_name, cmd_args = parse_command(args)
 
 
 def pip_freeze():
-    freeze = subprocess.run(['pip', 'freeze'],
-                            capture_output=True,
-                            text=True).stdout.strip()
+    freeze = subprocess.run(["pip", "freeze"], capture_output=True, text=True).stdout.strip()
     if freeze:
-        return dict(i.split('==') for i in freeze.split('\n'))
+        return dict(i.split("==") for i in freeze.split("\n"))
     else:
         return {}
 
@@ -49,31 +47,28 @@ def pip_freeze():
 def update_reqs(pkgs):
     file = Path("requirements.txt")
     if not file.exists():
-        file.open('w').close()
-    with file.open('r+') as f:
+        file.open("w").close()
+    with file.open("r+") as f:
         requires = {}
-        for l in f.read().splitlines():
-            pkg, ver = l.split("==")
-            if cmd_name == 'uninstall' and pkg in pkgs:
+        for line in f.read().splitlines():
+            pkg, ver = line.split("==")
+            if cmd_name == "uninstall" and pkg in pkgs:
                 continue
             else:
-                requires[pkg] = ver.strip() + '\n'
-        if cmd_name == 'install':
+                requires[pkg] = ver.strip() + "\n"
+        if cmd_name == "install":
             requires.update(pkgs)
         f.seek(0)
-        f.writelines('=='.join(item) for item in requires.items())
+        f.writelines("==".join(item) for item in requires.items())
         f.truncate()
 
 
 def main():
 
     if cmd_name in ("install", "uninstall"):
-        pkgs_maybe = {
-            canonicalize_name(i.split('==')[0])
-            for i in cmd_args if not i.startswith('-')
-        }
+        pkgs_maybe = {canonicalize_name(i.split("==")[0]) for i in cmd_args if not i.startswith("-")}
         pkgs_before = pip_freeze()
-        subprocess.run(['pip'] + args, check=False)
+        subprocess.run(["pip"] + args, check=False)
         pkgs_after = pip_freeze()
 
         pkgs_bfrset = set(canonicalize_name(i) for i in pkgs_before.keys())
@@ -89,7 +84,7 @@ def main():
                 rm_pkgs = {k: v for k, v in pkgs_before.items() if k in pkgs}
                 update_reqs(rm_pkgs)
     else:
-        subprocess.run(['pip'] + args, check=False)
+        subprocess.run(["pip"] + args, check=False)
 
 
 if __name__ == "__main__":

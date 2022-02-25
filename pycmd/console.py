@@ -1,8 +1,8 @@
 class Console:
-    ANSI_OK = '\033[92m'  # GREEN
-    ANSI_WARN = '\033[93m'  # YELLOW
-    ANSI_ERROR = '\033[91m'  # RED
-    ANSI_RESET = '\033[0m'  # RESET COLOR
+    ANSI_OK = "\033[92m"  # GREEN
+    ANSI_WARN = "\033[93m"  # YELLOW
+    ANSI_ERROR = "\033[91m"  # RED
+    ANSI_RESET = "\033[0m"  # RESET COLOR
 
     @classmethod
     def plain(cls, message):

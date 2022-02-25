@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-# usage: password [-h] [--num NUM] [--no-upper NO-UPPER] [--no-spec NO-SPEC] [--spec-chars SPEC-CHARS]
+# Description: Generate randomized password
+# Usage: password [-h] [--num NUM] [--no-upper NO-UPPER] [--no-spec NO-SPEC] [--spec-chars SPEC-CHARS]
 import argparse
 import pyperclip
 import secrets
 import string
 
-parser = argparse.ArgumentParser(
-    prog='password', description='Password generator')
-parser.add_argument('-n', '--num', type=int, default=16, help='password length')
-parser.add_argument('--no-upper', action='store_true', help='no uppercase')
-parser.add_argument('--no-spec', action='store_true', help='no special chars')
-parser.add_argument('--spec-chars', type=str, default="!@#$%^&*", help="special chars")
+parser = argparse.ArgumentParser(prog="password", description="Password generator")
+parser.add_argument("-n", "--num", type=int, default=16, help="password length")
+parser.add_argument("--no-upper", action="store_true", help="no uppercase")
+parser.add_argument("--no-spec", action="store_true", help="no special chars")
+parser.add_argument("--spec-chars", type=str, default="!@#$%^&*", help="special chars")
 args = parser.parse_args()
 
 

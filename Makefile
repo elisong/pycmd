@@ -1,35 +1,108 @@
 .ONESHELL:
-.PHONY: clean help install venv
+.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint venv
+.DEFAULT_GOAL := help
+PYTHONVENV ?= .venv
+BINDIR := $(PYTHONVENV)/bin
+PYTHON := $(BINDIR)/python
+
+
+define BROWSER_PYSCRIPT
+import os, webbrowser, sys
+
+from urllib.request import pathname2url
+
+webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
+endef
+export BROWSER_PYSCRIPT
+
+define PRINT_HELP_PYSCRIPT
+import re, sys
+
+for line in sys.stdin:
+	match = re.match(r'^([a-zA-Z_-]+):.*?## (.*)$$', line)
+	if match:
+		target, help = match.groups()
+		print("%-20s %s" % (target, help))
+endef
+export PRINT_HELP_PYSCRIPT
+
+BROWSER := $(PYTHON) -c "$$BROWSER_PYSCRIPT"
 
 help:
-	@echo "Comand Toolkits makefile"
-	@echo
-	@echo "Usage: make <target>"
-	@echo "Targets avaliable:"
-	@echo "  clean       Remove nnecessary files and folders."
-	@echo "  help        Help interface."
-	@echo "  install     Install project in editable mode."
-	@echo "  venv        Create virtual environment."
-	@echo "  venv-deps   Install deps from requirements.txt."
-
-clean:
-	@rm -rf .pytest_cache/ .mypy_cache/ junit/ build/ dist/
-	@find . -not -path './.venv*' -path '*/__pycache__*' -delete
-	@find . -not -path './.venv*' -path '*/*.egg-info*' -delete
+	@$(PYTHON) -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
 
-venv:
-	@rm -rf .venv
-	@python3 -m venv .venv
-	@.venv/bin/pip config --site --quiet set global.index-url "https://mirrors.cloud.tencent.com/pypi/simple"
-	@.venv/bin/pip install -U pip
+clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
+
+clean-build: ## remove build artifacts
+	rm -fr build/
+	rm -fr dist/
+	rm -fr .eggs/
+	find . -name '*.egg-info' -exec rm -fr {} +
+	find . -name '*.egg' -exec rm -f {} +
+
+clean-pyc: ## remove Python file artifacts
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -fr {} +
+
+clean-test: ## remove test and coverage artifacts
+	rm -fr .tox/
+	rm -f .coverage
+	rm -fr htmlcov/
+	rm -fr .pytest_cache
 
 
-deps: requirements.txt
-	@.venv/bin/pip install -r requirements.txt
+docs: ## generate Sphinx HTML documentation, including API docs
+	rm -f docs/glue.rst
+	rm -f docs/modules.rst
+	$(BINDIR)/sphinx-apidoc -o docs/ glue
+	$(MAKE) -C docs clean
+	$(MAKE) -C docs html
+	$(BROWSER) docs/_build/html/index.html
 
-test:
+servedocs: docs ## compile the docs watching for changes
+	$(BINDIR)/watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
+
+coverage: ## check code coverage quickly with the default Python
+	@$(BINDIR)/coverage run --source glue -m pytest
+	@$(BINDIR)/coverage report -m
+	@$(BINDIR)/coverage html
+	@$(BROWSER) htmlcov/index.html
 
 
-install:
-	@.venv/bin/pip install -e .
+format: ## format style with isort, black
+	$(BINDIR)/isort --profile=black --lines-after-imports=2 glue tests
+	$(BINDIR)/black glue tests
+
+lint: ## check style with isort, black, flake8, bandit
+	$(BINDIR)/isort --profile=black --lines-after-imports=2 --check-only glue tests
+	$(BINDIR)/black --check glue tests
+	$(BINDIR)/flake8 glue tests
+	$(BINDIR)/bandit -r glue
+
+test: ## run tests quickly with the default Python
+	$(PYTHON) -m pytest
+
+test-all: ## run tests on every Python version with tox
+	$(BINDIR)/tox
+
+dist: clean ## builds source and wheel package
+	$(PYTHON) -m setup sdist
+	$(PYTHON) -m setup bdist_wheel
+	ls -l dist
+
+release: dist ## package and upload a release
+	$(BINDIR)/twine upload dist/*
+
+install: clean ## install the package to the active Python's site-packages
+	$(PYTHON) -m setup.py install
+
+pre-commit: ## install pre-commit hook into .git
+	$(BINDIR)/pre-commit install
+
+venv: ## create virtual environment, install dev requirements
+	@test -d .venv || python3 -m venv .venv
+	$(PYTHON) -m pip install -U pip
+	$(PYTHON) -m pip install -r requirements_dev.txt
