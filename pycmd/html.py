@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
-# Description: Short for pandas's read_html
-# Usage: html url [-m] [--match MATCH] [-a] [--attr ATTR] [-o] [--output-file OUTPUT-FILE]
+# Description: Read HTML Table
+# Usage: html [-h] [-m MATCH] [-a ATTRS] [-o OUTPUT_FILE] url
 import argparse
-import pandas as pd
 from pathlib import Path
+import pandas as pd
+from .utils import Console
 
 
-parser = argparse.ArgumentParser(prog="html", description="Short for pandas's read_html")
-parser.add_argument("url", type=str, help="target url")
-parser.add_argument("-m", "--match", type=str, help="target expression")
-parser.add_argument("-a", "--attrs", type=str, help="target html attrs")
+parser = argparse.ArgumentParser(prog="html", description="Read HTML Table")
+parser.add_argument("-m", "--match", type=str, help="regular expression")
+parser.add_argument("-a", "--attrs", type=str, help="html attributes, comma sep")
 parser.add_argument("-o", "--output-file", type=str, help="output file")
+parser.add_argument("url", type=str, help="target url")
 args = parser.parse_args()
 
 
@@ -21,22 +22,25 @@ def main():
     else:
         attrs = None
     match = args.match or ".+"
-    tables = pd.read_html(args.url, match=match, attrs=attrs)
-    for table in tables:
-        print("\n\n")
-        print(table)
+    try:
+        tables = pd.read_html(args.url, match=match, attrs=attrs)
+        Console.info(f"Crawl {len(tables)} tables")
+        [print(f"\n{table}") for table in tables]
 
-    if args.output_file:
-        path = Path(args.output_file)
-        if len(tables) > 1:
-            for i, table in enumerate(tables):
-                new_file = f"{path.stem}_{str(i).zfill(2)}{path.suffix}"
-                new_path = Path(path.parent, new_file)
-                table.to_csv(new_path)
-                print(f"☕️ Saved in {new_path.as_posix()}.")
-        else:
-            tables[0].to_csv(path)
-            print(f"☕️ Saved in {path.as_posix()}.")
+        if args.output_file:
+            path = Path(args.output_file)
+            if len(tables) > 1:
+                for i, table in enumerate(tables):
+                    new_file = f"{path.stem}_{str(i).zfill(2)}{path.suffix}"
+                    new_path = Path(path.parent, new_file)
+                    table.to_csv(new_path)
+                    Console.info(f"Save in '{new_path.as_posix()}' ☕️")
+            else:
+                tables[0].to_csv(path)
+                Console.info(f"Save in '{path.as_posix()}' ☕️")
+
+    except ValueError as e:
+        Console.warn(e)
 
 
 if __name__ == "__main__":

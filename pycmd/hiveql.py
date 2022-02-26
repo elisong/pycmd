@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-# Description:  HiveQL case formatter: uppercase keywords, lowercase built-in funcs
-# Usage: hiveql [file File] [-i] [--inplace INPLACE] [-k] [--keep KEEP]
+# Description:  HiveQL Case Formatter
+# Usage: hiveql [-h] [-i] [-r RESERVE] file
 import argparse
-import re
 from pathlib import Path
+import re
+from .utils import Console
 
-parser = argparse.ArgumentParser(prog="hive", description="Hive case formatter")
-parser.add_argument("file", type=str, help="Target file")
-parser.add_argument("-i", "--inplace", action="store_true", help="Whether inplace")
-parser.add_argument("-k", "--keep", type=str, help="Patterns keep un-touch, | sep")
+parser = argparse.ArgumentParser(prog="hiveql", description="HiveQL Case Formatter")
+parser.add_argument("-i", "--inplace", action="store_true", help="format inplace")
+parser.add_argument("-r", "--reserve", type=str, help="patterns reserved, comma seporated")
+parser.add_argument("file", type=str, help="source file")
 args = parser.parse_args()
 
 RESERVED_KWS = [
@@ -610,23 +611,21 @@ BUILT_IN_FUNCTIONS = [
 
 
 def substitute(content):
-    # trick when file's first/last word is keyword.
-    content = " " + content + " "
-
     keywords = BUILT_IN_FUNCTIONS + RESERVED_KWS + NON_RESERVED_KWS
-    if args.keep:
-        keywords += args.keep.split("|")
+    if args.reserve:
+        keywords += args.reserve.split(",")
 
+    # tricks while file's first/last word is keyword.
+    content = " " + content + " "
     for kw in keywords:
-        # 重叠匹配
+        # overlapping patterns
         # https://stackoverflow.com/questions/44009040/replacing-all-overlapping-patterns-in-a-string/44009095#44009095
-        # 且非单/双引号或``包围的
         content = re.sub(rf"(?<=[^a-zA-Z0-9_\'\"`]){kw}(?=[^a-zA-Z0-9_\'\"`])", kw, content, flags=re.I)
     return content.strip()
 
 
 def patch(content, direction="out"):
-    # 一些已知的过度uppercase，最安全方式是跳过
+    # some special case
     # [1] SET xxx=yyy;
     # [2] ADD JAR hdfs:///...jar;
     # [3] #set ($VARIABLE="xxxx")
@@ -646,6 +645,7 @@ def main():
             content = f.read()
 
         content = patch(substitute(content))
+        Console.info(f"Format success")
         print(content)
         if not args.inplace:
             new_name = f"{path.stem}_copy{path.suffix}"
@@ -653,7 +653,9 @@ def main():
 
         with path.open("w", encoding="utf-8") as f:
             f.write(content)
-            print(f"\n\n☕️ Alreay saved in `{path.as_posix()}`.")
+        Console.info(f"Save in '{path.as_posix()}' ☕️")
+    else:
+        Console.error(f"File '{path.as_posix()}' not exit")
 
 
 if __name__ == "__main__":
