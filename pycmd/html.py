@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-# Description: Read HTML Table
+# Description: Fetch HTML Table
 # Usage: html [-h] [-m MATCH] [-a ATTRS] [-o OUTPUT_FILE] url
 import argparse
 from pathlib import Path
+
 import pandas as pd
+
 from .utils import Console
 
 
-parser = argparse.ArgumentParser(prog="html", description="Read HTML Table")
+parser = argparse.ArgumentParser(prog="html", description="Fetch HTML Table")
 parser.add_argument("-m", "--match", type=str, help="regular expression")
 parser.add_argument("-a", "--attrs", type=str, help="html attributes, comma sep")
 parser.add_argument("-o", "--output-file", type=str, help="output file")

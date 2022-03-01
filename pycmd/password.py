@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
-# Description: Generate randomized password
-# Usage: password [-h] [--num NUM] [--no-upper NO-UPPER] [--no-spec NO-SPEC] [--spec-chars SPEC-CHARS]
+# Description: Randomized Password
+# Usage: password [-h] [-n NUM] [--no-upper] [--no-spec] [--spec-chars SPEC_CHARS]
 import argparse
-import pyperclip
 import secrets
 import string
 
-parser = argparse.ArgumentParser(prog="password", description="Password generator")
+import pyperclip
+
+from .utils import Console
+
+
+parser = argparse.ArgumentParser(prog="password", description="Randomized Password")
 parser.add_argument("-n", "--num", type=int, default=16, help="password length")
 parser.add_argument("--no-upper", action="store_true", help="no uppercase")
 parser.add_argument("--no-spec", action="store_true", help="no special chars")
@@ -34,7 +38,7 @@ def main():
         if all([cond_digit, cond_lower, cond_upper, cond_spec]):
             break
     pyperclip.copy(text)
-    print(f"{text}\n\n☕️ Alreay copied, just paste it.")
+    Console.info(f"{text}\n\nAlreay copied, just paste it ☕️")
 
 
 if __name__ == "__main__":

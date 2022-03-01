@@ -1,33 +1,54 @@
 # -*- coding: utf-8 -*-
-# Description: Short for fetch .gitignore file form github
-# Usage: ignore python
+# Description: Fetch License Template
+# Usage: license [-h] [-o OUTPUT_FILE] key
 import argparse
-from urllib.request import urlopen
 import json
 import subprocess
 from datetime import datetime
+from urllib.request import urlopen
 
-LICENSE_FILE = "LICENSE"
+from .utils import Console
 
-parser = argparse.ArgumentParser(prog="license", description="Fetch license from github api")
-parser.add_argument("key", type=str, help="License key")
+
+parser = argparse.ArgumentParser(prog="license", description="Fetch License Template")
+parser.add_argument("key", type=str, default="mit", help="license key")
+parser.add_argument("-o", "--output-file", type=str, default="LICENSE", help="license file")
 args = parser.parse_args()
-key = args.key.lower()
+
+
 license_year = str(datetime.now().year)
 license_user = subprocess.check_output(["git", "config", "--get", "user.name"], encoding="utf8").strip()
 
 
-def main():
-    url = "https://api.github.com/licenses/" + key
+def licenses_info():
+    url = "https://api.github.com/licenses"
+    return json.load(urlopen(url))
+
+
+def license_content(key):
+    url = f"https://api.github.com/licenses/{key}"
     body = json.load(urlopen(url))["body"]
     if key in ("mit", "bsd-3-claus", "bsd-2-clause"):
-        output = body.replace("[year]", license_year).replace("[fullname]", license_user)
+        content = body.replace("[year]", license_year).replace("[fullname]", license_user)
     elif key == "apache-2.0":
-        output = body.replace("[yyyy]", license_year).replace("[name of copyright owner]", license_user)
+        content = body.replace("[yyyy]", license_year).replace("[name of copyright owner]", license_user)
     else:
-        output = body
-    with open(LICENSE_FILE, "w+") as f:
-        f.write(output)
+        content = body
+    return content
+
+
+def main():
+    licenses = licenses_info()
+    if args.key.lower() not in [license["key"] for license in licenses]:
+        Console.error("Choose license key from below:")
+        for license in licenses:
+            Console.plain(license["key"])
+        return
+
+    content = license_content(args.key.lower())
+    with open(args.output_file, "w+") as f:
+        f.write(content)
+        Console.info(f"Saved in '{args.output_file}' ☕️")
 
 
 if __name__ == "__main__":

@@ -55,9 +55,9 @@ clean-test: ## remove test and coverage artifacts
 
 
 docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/glue.rst
+	rm -f docs/pycmd.rst
 	rm -f docs/modules.rst
-	$(BINDIR)/sphinx-apidoc -o docs/ glue
+	$(BINDIR)/sphinx-apidoc -o docs/ pycmd
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
@@ -66,21 +66,21 @@ servedocs: docs ## compile the docs watching for changes
 	$(BINDIR)/watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 coverage: ## check code coverage quickly with the default Python
-	@$(BINDIR)/coverage run --source glue -m pytest
+	@$(BINDIR)/coverage run --source pycmd -m pytest
 	@$(BINDIR)/coverage report -m
 	@$(BINDIR)/coverage html
 	@$(BROWSER) htmlcov/index.html
 
 
 format: ## format style with isort, black
-	$(BINDIR)/isort --profile=black --lines-after-imports=2 glue tests
-	$(BINDIR)/black glue tests
+	$(BINDIR)/isort --profile=black --lines-after-imports=2 pycmd tests
+	$(BINDIR)/black pycmd tests
 
 lint: ## check style with isort, black, flake8, bandit
-	$(BINDIR)/isort --profile=black --lines-after-imports=2 --check-only glue tests
-	$(BINDIR)/black --check glue tests
-	$(BINDIR)/flake8 glue tests
-	$(BINDIR)/bandit -r glue
+	$(BINDIR)/isort --profile=black --lines-after-imports=2 --check-only pycmd tests
+	$(BINDIR)/black --check pycmd tests
+	$(BINDIR)/flake8 pycmd tests
+	$(BINDIR)/bandit -r pycmd
 
 test: ## run tests quickly with the default Python
 	$(PYTHON) -m pytest
@@ -97,7 +97,7 @@ release: dist ## package and upload a release
 	$(BINDIR)/twine upload dist/*
 
 install: clean ## install the package to the active Python's site-packages
-	$(PYTHON) -m setup.py install
+	$(PYTHON) -m pip install .
 
 pre-commit: ## install pre-commit hook into .git
 	$(BINDIR)/pre-commit install

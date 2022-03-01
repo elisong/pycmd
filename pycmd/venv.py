@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-# Description: Create python virtual environment on MacOS.
-# Usage: venv
+# Description: Create Python Virtual-Env on MacOS.
+# Usage: venv [-d DIRECTORY]
 import argparse
-from pathlib import Path
 import shutil
 import subprocess
+from pathlib import Path
+
 from simple_term_menu import TerminalMenu
+
 from .utils import Console
 
-parser = argparse.ArgumentParser(prog="venv", description="Create Python virtual environment")
-parser.add_argument("-d", "--directory", type=str, default='.venv', help="directory")
+
+parser = argparse.ArgumentParser(prog="venv", description="Create Python Virtual-Env")
+parser.add_argument("-d", "--directory", type=str, default=".venv", help="directory")
 args = parser.parse_args()
 
 
@@ -41,8 +44,8 @@ def create_venv(path):
     subprocess.run([path, "-m", "venv", args.directory])
 
     subprocess.run([f"{args.directory}/bin/pip", "install", "-U", "pip"], stdout=subprocess.DEVNULL)
-    pip_vern = subprocess.run(f"{args.directory}/bin/pip --version" + " | awk '{print $2}'", shell=True, text=True,capture_output=True)
-    Console.info(f"Upgrade pip itself to {pip_vern.stdout.strip()}")
+    pip_vern = subprocess.run(f"{args.directory}/bin/pip --version", text=True, capture_output=True)
+    Console.info(f"Upgrade pip itself to {pip_vern.stdout.strip().split(' ')[1]}")
 
 
 def switch_mirror():
@@ -81,7 +84,7 @@ def main():
     create_venv(path)
     switch_mirror()
     install_deps()
-    Console.info(f"Activate via 'source {args.directory}/bin/activate' ☕️")
+    Console.info(f"Activate by 'source {args.directory}/bin/activate' ☕️")
 
 
 if __name__ == "__main__":

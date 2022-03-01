@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-# Usage:
-#   ppm <command> [options]
+# Description: Wrapper over pip
+# Usage: ppm <command> [options]
 
 # Commands:
 #   install                     Install packages.
@@ -19,6 +19,8 @@
 #   debug                       Show information useful for debugging.
 #   help                        Show help for commands.
 
+import subprocess
+
 ######################################################
 # More packages related to `pip` environment
 # - pipenv
@@ -28,9 +30,10 @@
 ######################################################
 import sys
 from pathlib import Path
-import subprocess
-from pip._vendor.packaging.utils import canonicalize_name
+
 from pip._internal.cli.main_parser import parse_command
+from pip._vendor.packaging.utils import canonicalize_name
+
 
 args = sys.argv[1:]
 cmd_name, cmd_args = parse_command(args)
@@ -39,13 +42,13 @@ cmd_name, cmd_args = parse_command(args)
 def pip_freeze():
     freeze = subprocess.run(["pip", "freeze"], capture_output=True, text=True).stdout.strip()
     if freeze:
-        return dict(i.split("==") for i in freeze.split("\n"))
+        return dict(package.split("==") for package in freeze.split("\n") if "==" in package)
     else:
         return {}
 
 
 def update_reqs(pkgs):
-    file = Path("requirements.txt")
+    file = Path("requirements_dev.txt")
     if not file.exists():
         file.open("w").close()
     with file.open("r+") as f:
@@ -64,7 +67,6 @@ def update_reqs(pkgs):
 
 
 def main():
-
     if cmd_name in ("install", "uninstall"):
         pkgs_maybe = {canonicalize_name(i.split("==")[0]) for i in cmd_args if not i.startswith("-")}
         pkgs_before = pip_freeze()

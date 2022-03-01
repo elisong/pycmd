@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
-# Description:  HiveQL Case Formatter
+# Description:  HiveQL Keywords Formatter
 # Usage: hiveql [-h] [-i] [-r RESERVE] file
 import argparse
-from pathlib import Path
 import re
+from pathlib import Path
+
 from .utils import Console
 
-parser = argparse.ArgumentParser(prog="hiveql", description="HiveQL Case Formatter")
+
+parser = argparse.ArgumentParser(prog="hiveql", description="HiveQL Keywords Formatter")
 parser.add_argument("-i", "--inplace", action="store_true", help="format inplace")
 parser.add_argument("-r", "--reserve", type=str, help="patterns reserved, comma seporated")
 parser.add_argument("file", type=str, help="source file")

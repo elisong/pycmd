@@ -2,12 +2,14 @@
 
 ## Introduction
 
-- **gsearch**: search google and write down links to markdown(.md) file
-- **ppm**: wrapper over pip, but auto-update to requirements.txt
-- **venv**: create Python vitual environment according version selected
-- **license**: get LICENSE template, "[year][name]" replace by current year and git user.name
-- **ignore**: get .gitignore template for specified language
-- **password**: generate random password
+- **gsearch**: search google and save links to markdown(.md) file
+- **ppm**: wrapper over pip, but auto-update to requirements_dev.txt
+- **venv**: create create python virtual-env on MacOS
+- **license**: fetch license template, "[year][name]" replace by current year and git's user.name
+- **ignore**: fetch .gitignore template for specific language
+- **password**: generate randomized password
+- **html**: fetch online-HTML table use pandas's read_html
+- **hivesql**: format HiveQL keywords
 
 ## Install
 
