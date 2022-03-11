@@ -1,5 +1,5 @@
 .ONESHELL:
-.PHONY: clean clean-build clean-pyc clean-test coverage dist docs help install lint venv
+.PHONY: clean clean-build clean-pyc clean-test coverage dist help install lint venv
 .DEFAULT_GOAL := help
 PYTHONVENV ?= .venv
 BINDIR := $(PYTHONVENV)/bin
@@ -52,15 +52,6 @@ clean-test: ## remove test and coverage artifacts
 	rm -f .coverage
 	rm -fr htmlcov/
 	rm -fr .pytest_cache
-
-
-docs: ## generate Sphinx HTML documentation, including API docs
-	rm -f docs/pycmd.rst
-	rm -f docs/modules.rst
-	$(BINDIR)/sphinx-apidoc -o docs/ pycmd
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
-	$(BROWSER) docs/_build/html/index.html
 
 servedocs: docs ## compile the docs watching for changes
 	$(BINDIR)/watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
