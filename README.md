@@ -14,7 +14,5 @@
 ## Install
 
 ```sh
-git clone git@github.com:elisong/pycmd.git
-cd pycmd
-python3 -m pip install .
+pip install git+https://github.com/elisong/pycmd.git
 ```
