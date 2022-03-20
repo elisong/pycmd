@@ -647,7 +647,7 @@ def main():
             content = f.read()
 
         content = patch(substitute(content))
-        Console.info(f"Format success")
+        Console.info("Format success")
         print(content)
         if not args.inplace:
             new_name = f"{path.stem}_copy{path.suffix}"
