@@ -27,7 +27,7 @@ def main():
     try:
         tables = pd.read_html(args.url, match=match, attrs=attrs)
         Console.info(f"Crawl {len(tables)} tables")
-        [print(f"\n{table}") for table in tables]
+        [Console.plain(f"\n{table}") for table in tables]
 
         if args.output_file:
             path = Path(args.output_file)
