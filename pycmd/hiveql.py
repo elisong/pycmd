@@ -626,7 +626,7 @@ def substitute(content):
     return content.strip()
 
 
-def patch(content, direction="out"):
+def patch(content):
     # some special case
     # [1] SET xxx=yyy;
     # [2] ADD JAR hdfs:///...jar;

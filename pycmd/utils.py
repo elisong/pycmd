@@ -1,3 +1,5 @@
+import contextlib
+import os
 import re
 
 
@@ -28,3 +30,13 @@ class Console:
     @classmethod
     def escape(cls, message):
         return cls.ANSI_ESCAPE.sub("", message.decode("utf-8").strip())
+
+
+@contextlib.contextmanager
+def cd(dpath):
+    old_dpath = os.getcwd()
+    os.chdir(dpath)
+    try:
+        yield
+    finally:
+        os.chdir(old_dpath)
