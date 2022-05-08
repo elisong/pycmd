@@ -109,8 +109,10 @@ def clone(all):
         for link in links:
             name = link.rpartition(".")[0].partition(":")[-1].partition("/")[-1]
             if not Path(name).is_dir():
+                click.secho(f"clone {link}", fg="yellow", bold=True)
                 subprocess.run(["git", "clone", link])
     else:
+        click.secho("Command: repo clone ↩︎", fg="green", bold=True)
         question = [
             {
                 "type": "list",
@@ -122,6 +124,7 @@ def clone(all):
         link = prompt(question)["repo"]
         name = link.rpartition(".")[0].partition(":")[-1].partition("/")[-1]
         if not Path(name).is_dir():
+            click.secho(f"git clone {link}", fg="yellow", bold=True)
             subprocess.run(["git", "clone", link])
     upgrade()
 
@@ -133,11 +136,12 @@ def pull(all):
     if all:
         click.secho("Command: repo pull --all ↩︎", fg="green", bold=True)
         for dir in repos.values():
-            click.secho(f"Command: repo pull {dir.name} ↩︎", fg="green", bold=True)
             with cd(dir):
+                click.secho(f"cd {dir.name}; git pull", fg="yellow", bold=True)
                 subprocess.run(["git", "pull"])
 
     else:
+        click.secho("Command: repo pull ↩︎", fg="green", bold=True)
         question = [
             {
                 "type": "list",
@@ -148,7 +152,7 @@ def pull(all):
         ]
         name = prompt(question)["repo"]
         with cd(name):
-            click.secho(f"Command: repo pull {name} ↩︎", fg="green", bold=True)
+            click.secho(f"cd {name}; git pull", fg="yellow", bold=True)
             subprocess.run(["git", "pull"])
 
 
