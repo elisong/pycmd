@@ -44,7 +44,6 @@ def repo_cloned():
 
 
 def upgrade():
-    click.secho("Command: repo upgrade ↩︎", fg="green", bold=True)
     repos = repo_cloned()
     links = ioHandler("repo.txt", op="r")
 
@@ -53,16 +52,20 @@ def upgrade():
     ioHandler("repo.txt", data=links, op="w")
     subprocess.run(["cat", "repo.txt"])
 
+    click.echo("\n")
     click.secho("update .gitignore", fg="yellow", bold=True)
     gitignore = ioHandler(".gitignore", op="r")
-    for link, dir in repos.item():
+    addtions = []
+    for dir in repos.values():
+        has_found = False
         for ignore in gitignore:
             if dir.name in ignore:
-                repos.pop(link)
+                has_found = True
                 continue
-    gitignore.extend(dir.name for dir in repos.values())
+        if not has_found:
+            addtions.append(dir.name + "/")
+    gitignore.extend(addtions)
     ioHandler(".gitignore", data=gitignore, op="w")
-    click.echo("\n")
     subprocess.run(["cat", ".gitignore"])
 
 
