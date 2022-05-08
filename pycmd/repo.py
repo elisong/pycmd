@@ -43,6 +43,29 @@ def repo_cloned():
     return repos
 
 
+def upgrade():
+    click.secho("Command: repo upgrade ↩︎", fg="green", bold=True)
+    repos = repo_cloned()
+    links = ioHandler("repo.txt", op="r")
+
+    click.secho("update repo.txt", fg="yellow", bold=True)
+    links = sorted(list(set(links) | set(repos.keys())))
+    ioHandler("repo.txt", data=links, op="w")
+    subprocess.run(["cat", "repo.txt"])
+
+    click.secho("update .gitignore", fg="yellow", bold=True)
+    gitignore = ioHandler(".gitignore", op="r")
+    for link, dir in repos.item():
+        for ignore in gitignore:
+            if dir.name in ignore:
+                repos.pop(link)
+                continue
+    gitignore.extend(dir.name for dir in repos.values())
+    ioHandler(".gitignore", data=gitignore, op="w")
+    click.echo("\n")
+    subprocess.run(["cat", ".gitignore"])
+
+
 @click.group()
 def cli():
     pass
@@ -72,30 +95,6 @@ def search(keyword):
         )
 
     pprint(result, sort_dicts=False)
-
-
-@cli.command()
-def upgrade():
-    click.secho("Command: repo upgrade ↩︎", fg="green", bold=True)
-    repos = repo_cloned()
-    links = ioHandler("repo.txt", op="r")
-
-    click.secho("update repo.txt", fg="yellow", bold=True)
-    links = sorted(list(set(links) | set(repos.keys())))
-    ioHandler("repo.txt", data=links, op="w")
-    subprocess.run(["cat", "repo.txt"])
-
-    click.secho("update .gitignore", fg="yellow", bold=True)
-    gitignore = ioHandler(".gitignore", op="r")
-    for link, dir in repos.item():
-        for ignore in gitignore:
-            if dir.name in ignore:
-                repos.pop(link)
-                continue
-    gitignore.extend(dir.name for dir in repos.values())
-    ioHandler(".gitignore", data=gitignore, op="w")
-    click.echo("\n")
-    subprocess.run(["cat", ".gitignore"])
 
 
 @cli.command()
