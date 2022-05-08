@@ -6,7 +6,7 @@ import shutil
 import subprocess
 from pathlib import Path
 
-from simple_term_menu import TerminalMenu
+from PyInquirer import prompt
 
 from .utils import Console
 
@@ -27,10 +27,16 @@ def choose_pyvern():
     verns = sorted(x.name.capitalize() for c in cellar for x in c.glob("python@3*"))
     paths = sorted(str(x) for c in cellar for x in c.glob("python@3*/3.*/bin/python3"))
 
-    menu = TerminalMenu(verns)
-    index = menu.show()
-    vern = verns[index]
-    path = paths[index]
+    question = [
+        {
+            "type": "list",
+            "name": "verns",
+            "message": "version",
+            "choices": verns,
+        }
+    ]
+    vern = prompt(question)["verns"]
+    path = paths[verns.index(vern)]
     Console.info(vern)
     return path
 
@@ -56,10 +62,16 @@ def switch_mirror():
         "https://pypi.tuna.tsinghua.edu.cn/simple",
         "https://pypi.mirrors.ustc.edu.cn/simple/",
     ]
-    menu = TerminalMenu(mirrors)
-    index = menu.show()
-    mirror = mirrors[index]
-    if index > 0:
+    question = [
+        {
+            "type": "list",
+            "name": "mirrors",
+            "message": "mirror",
+            "choices": mirrors,
+        }
+    ]
+    mirror = prompt(question)["mirrors"]
+    if mirror != "skip":
         subprocess.run([f"{args.directory}/bin/pip", "config", "--site", "-q", "set", "global.index-url", mirror])
     Console.info(mirror)
 
@@ -71,10 +83,17 @@ def install_deps():
 
     Console.info("Install from requirements*.txt ?")
     req_files.insert(0, "skip")
-    menu = TerminalMenu(req_files)
-    index = menu.show()
-    req_file = req_files[index]
-    if index > 0:
+    question = [
+        {
+            "type": "list",
+            "name": "req_files",
+            "message": "requirements*.txt",
+            "choices": req_files,
+        }
+    ]
+    req_file = prompt(question)["req_files"]
+
+    if req_file != "skip":
         subprocess.run([f"{args.directory}/bin/pip", "install", "-r", req_file])
     Console.info(req_file)
 
