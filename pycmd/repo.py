@@ -4,7 +4,7 @@ from pprint import pprint
 
 import click
 import requests
-from PyInquirer import prompt
+from InquirerPy import prompt
 
 from .utils import cd
 
@@ -20,7 +20,7 @@ def read_lines(file):
     return result
 
 
-def ioHandler(file, data=None, op="r"):
+def io_handler(file, data=None, op="r"):
     fpath = Path(file)
     if op == "r":
         if fpath.is_file():
@@ -45,16 +45,16 @@ def repo_cloned():
 
 def upgrade():
     repos = repo_cloned()
-    links = ioHandler("repo.txt", op="r")
+    links = io_handler("repo.txt", op="r")
 
     click.secho("update repo.txt", fg="yellow", bold=True)
     links = sorted(list(set(links) | set(repos.keys())))
-    ioHandler("repo.txt", data=links, op="w")
+    io_handler("repo.txt", data=links, op="w")
     subprocess.run(["cat", "repo.txt"])
 
     click.echo("\n")
     click.secho("update .gitignore", fg="yellow", bold=True)
-    gitignore = ioHandler(".gitignore", op="r")
+    gitignore = io_handler(".gitignore", op="r")
     addtions = []
     for dir in repos.values():
         has_found = False
@@ -65,7 +65,7 @@ def upgrade():
         if not has_found:
             addtions.append(dir.name + "/")
     gitignore.extend(addtions)
-    ioHandler(".gitignore", data=gitignore, op="w")
+    io_handler(".gitignore", data=gitignore, op="w")
     subprocess.run(["cat", ".gitignore"])
 
 
@@ -103,7 +103,7 @@ def search(keyword):
 @cli.command()
 @click.option("--all", is_flag=True)
 def clone(all):
-    links = ioHandler("repo.txt", op="r")
+    links = io_handler("repo.txt", op="r")
     if all:
         click.secho("Command: repo clone --all ↩︎", fg="green", bold=True)
         for link in links:
