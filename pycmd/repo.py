@@ -91,6 +91,7 @@ def search(keyword):
                 "full_name": item["full_name"],
                 "description": item["description"],
                 "ssh_url": item["ssh_url"],
+                "html_url": item["html_url"],
                 "visibility": item["visibility"],
                 "updated_at": item["updated_at"],
                 "created_at": item["created_at"],
