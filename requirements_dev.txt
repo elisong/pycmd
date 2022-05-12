@@ -16,4 +16,4 @@ pysocks==1.7.1
 google==3.0.0
 inquirerpy==0.3.3
 click==8.0.4
-requests==2.27.1
+requests==2.25.1
