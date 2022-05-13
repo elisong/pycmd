@@ -9,7 +9,7 @@
 - **ignore**: fetch .gitignore template for specific language
 - **password**: generate randomized password
 - **html**: fetch online-HTML table use pandas's read_html
-- **hivesql**: format HiveQL keywords
+- **hiveql**: format HiveQL keywords
 
 ## Install
 
