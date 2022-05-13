@@ -1,9 +1,11 @@
+import json
 import subprocess
 from pathlib import Path
 from pprint import pprint
+from urllib.parse import urlencode
+from urllib.request import Request, urlopen
 
 import click
-import requests
 from InquirerPy import prompt
 
 from .utils import cd
@@ -75,16 +77,28 @@ def cli():
 
 
 @cli.command()
-@click.argument("keyword")
-def search(keyword):
-    click.secho(f"Command: repo search {keyword} ↩︎", fg="green", bold=True)
-    resp = requests.get(
-        "https://api.github.com/search/repositories",
-        params={"q": keyword, "sort": "stars", "order": "desc"},
-        headers={"Accept": "application/vnd.github.v3+json"},
-    )
+@click.argument("q")
+@click.option("-l", "--language")
+@click.option(
+    "-s",
+    "--sort",
+    type=click.Choice(["best-match", "stars", "forks", "help-wanted-issues", "updated"]),
+    default="best-match",
+)
+@click.option("-o", "--order", type=click.Choice(["desc", "asc"]), default="desc")
+def search(q, language, sort, order):
+    if language:
+        params = urlencode({"q": f"{q}+language:{language}", "sort": sort, "order": order})
+    else:
+        params = urlencode({"q": q, "sort": sort, "order": order})
+
+    click.secho(f"Command: repo search {params} ↩︎", fg="green", bold=True)
+    base_url = "https://api.github.com/search/repositories"
+    request = Request(f"{base_url}?{params}")
+    request.add_header("Accept", "application/vnd.github.v3+json")
+
     result = []
-    for item in resp.json()["items"]:
+    for item in json.load(urlopen(request))["items"]:
         result.append(
             {
                 "name": item["name"],
