@@ -27,8 +27,8 @@ def io_handler(file, data=None, op="r"):
     if op == "r":
         if fpath.is_file():
             with open(fpath, "r") as f:
-                data = [l.rstrip("\n") for l in f if l.rstrip("\n")]
-        return data
+                return [l.rstrip("\n") for l in f if l.rstrip("\n")]
+        return []
     else:
         with open(fpath, "w+") as f:
             f.writelines("\n".join(data))
