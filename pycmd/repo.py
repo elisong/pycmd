@@ -172,7 +172,7 @@ def pull(all):
 
 
 @cli.command()
-@click.option("-o", "--output", defalut=repo.txt)
+@click.option("-o", "--output", default="repo.txt")
 def sync(output):
     click.secho(f"Command: repo sync ↩︎", fg="green", bold=True)
     _sync()
