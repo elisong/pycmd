@@ -45,7 +45,7 @@ def repo_cloned():
     return repos
 
 
-def upgrade():
+def _sync():
     repos = repo_cloned()
     links = io_handler("repo.txt", op="r")
 
@@ -141,7 +141,7 @@ def clone(all):
         if not Path(name).is_dir():
             click.secho(f"git clone {link}", fg="yellow", bold=True)
             subprocess.run(["git", "clone", link])
-    upgrade()
+    _sync()
 
 
 @cli.command()
@@ -169,6 +169,13 @@ def pull(all):
         with cd(name):
             click.secho(f"cd {name}; git pull", fg="yellow", bold=True)
             subprocess.run(["git", "pull"])
+
+
+@cli.command()
+@click.option("-o", "--output", defalut=repo.txt)
+def sync(output):
+    click.secho(f"Command: repo sync ↩︎", fg="green", bold=True)
+    _sync()
 
 
 if __name__ == "__main__":

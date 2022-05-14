@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Description: Create Python Virtual-Env on MacOS.
-# Usage: venv [-d DIRECTORY]
+# Usage: venv [-d DIR]
 import argparse
 import shutil
 import subprocess
@@ -12,12 +12,11 @@ from .utils import Console
 
 
 parser = argparse.ArgumentParser(prog="venv", description="Create Python Virtual-Env")
-parser.add_argument("-d", "--directory", type=str, default=".venv", help="directory")
+parser.add_argument("-d", "--dir", type=str, default=".venv", help="dir")
 args = parser.parse_args()
 
 
 def choose_pyvern():
-    Console.info("Which Python version prefer ?")
     cellar = []
     if Path("/usr/local/Cellar").is_dir():
         cellar.append(Path("/usr/local/Cellar"))
@@ -31,31 +30,26 @@ def choose_pyvern():
         {
             "type": "list",
             "name": "verns",
-            "message": "version",
+            "message": "Which Python prefer ?",
             "choices": verns,
         }
     ]
     vern = prompt(question)["verns"]
     path = paths[verns.index(vern)]
-    Console.info(vern)
     return path
 
 
 def create_venv(path):
-    Console.info(f"Create virtual environment in {args.directory}")
+    Console.info(f"Create virtual environment in {args.dir}")
     try:
-        shutil.rmtree(args.directory)
+        shutil.rmtree(args.dir)
     except FileNotFoundError:
         pass
-    subprocess.run([path, "-m", "venv", args.directory])
-
-    subprocess.run([f"{args.directory}/bin/pip", "install", "-U", "pip"], stdout=subprocess.DEVNULL)
-    pip_vern = subprocess.run(f"{args.directory}/bin/pip --version", text=True, capture_output=True)
-    Console.info(f"Upgrade pip itself to {pip_vern.stdout.strip().split(' ')[1]}")
+    subprocess.run([path, "-m", "venv", args.dir])
+    subprocess.run([f"{args.dir}/bin/pip", "install", "-U", "pip"], stdout=subprocess.DEVNULL)
 
 
 def switch_mirror():
-    Console.info("Switch pip mirror ?")
     mirrors = [
         "skip",
         "https://mirrors.cloud.tencent.com/pypi/simple",
@@ -66,14 +60,13 @@ def switch_mirror():
         {
             "type": "list",
             "name": "mirrors",
-            "message": "mirror",
+            "message": "Which pip mirror prefer ?",
             "choices": mirrors,
         }
     ]
     mirror = prompt(question)["mirrors"]
     if mirror != "skip":
-        subprocess.run([f"{args.directory}/bin/pip", "config", "--site", "-q", "set", "global.index-url", mirror])
-    Console.info(mirror)
+        subprocess.run([f"{args.dir}/bin/pip", "config", "--site", "-q", "set", "global.index-url", mirror])
 
 
 def install_deps():
@@ -81,21 +74,19 @@ def install_deps():
     if not req_files:
         return
 
-    Console.info("Install from requirements*.txt ?")
     req_files.insert(0, "skip")
     question = [
         {
             "type": "list",
             "name": "req_files",
-            "message": "requirements*.txt",
+            "message": "Install from requirements*.txt ?",
             "choices": req_files,
         }
     ]
     req_file = prompt(question)["req_files"]
 
     if req_file != "skip":
-        subprocess.run([f"{args.directory}/bin/pip", "install", "-r", req_file])
-    Console.info(req_file)
+        subprocess.run([f"{args.dir}/bin/pip", "install", "-r", req_file])
 
 
 def main():
@@ -103,7 +94,7 @@ def main():
     create_venv(path)
     switch_mirror()
     install_deps()
-    Console.info(f"Activate by 'source {args.directory}/bin/activate' ☕️")
+    Console.info(f"☕️ Finished, start by 'source {args.dir}/bin/activate'")
 
 
 if __name__ == "__main__":
