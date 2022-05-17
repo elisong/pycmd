@@ -41,6 +41,19 @@ class TestHiveQL:
             result = f.read()
         assert result.strip() == EXPECT_FORMAT.strip()
 
+    def test_format_online_success(self):
+        test_file = "tests/data/test.hql"
+        path = Path(test_file)
+        path_copy = Path(path.parent, f"{path.stem}_copy{path.suffix}")
+        if path_copy.is_file():
+            path_copy.unlink()
+            assert not path_copy.is_file()
+        subprocess.run(["python", "-m", "pycmd.hiveql", test_file, "-o"], stdout=subprocess.DEVNULL)
+        assert path_copy.is_file()
+        with path_copy.open("r", encoding="utf-8") as f:
+            result = f.read()
+        assert result.strip() == EXPECT_FORMAT.strip()
+
     def test_reserve_success(self):
         test_file = "tests/data/test.hql"
         path = Path(test_file)
